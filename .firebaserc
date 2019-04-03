@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "staging": "ninja-19feb2019",
+    "default": "ninja-19feb2019"
+  }
+}

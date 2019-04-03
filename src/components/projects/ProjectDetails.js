@@ -2,9 +2,12 @@ import React from "react";
 import { connect } from "react-redux";
 import { firestoreConnect } from "react-redux-firebase";
 import { compose } from "redux";
+import { Redirect } from "react-router-dom";
+import moment from "moment";
 
 const ProjectDetails = props => {
-  const { project } = props;
+  const { project, auth } = props;
+  if (!auth.uid) return <Redirect to="/signin" />;
   if (project) {
     return (
       <div className="container section project-details">
@@ -33,7 +36,7 @@ const ProjectDetails = props => {
             <div>
               Posted by {project.userFirstName} {project.userLastName}
             </div>
-            <div>2nd September, 2am</div>
+            <div>{moment(project.createdAt.toDate()).calendar()}</div>
           </div>
         </div>
       </div>
@@ -53,7 +56,8 @@ const mapStateToProps = (state, ownProps) => {
   const projects = state.firestore.data.projects;
   const project = projects ? projects[id] : null;
   return {
-    project: project
+    project: project,
+    auth: state.firebase.auth
   };
 };
 
@@ -65,3 +69,17 @@ export default compose(
     }
   ])
 )(ProjectDetails);
+// service cloud.firestore {
+//   match /databases/{database}/documents {
+//     match /projects/{project} {
+//       allow read, write : if request.auth.uid !=null
+//     }
+//     match /users/{userId} {
+//      allow create
+//       allow read: if request.auth.uid != null
+//       allow write: if request.auth.uid == userId
+//     }
+//   }
+// }
+// firebase LOGIN COMMAND LINE ERROR
+// export PATH=~/.npm-global/bin:$PATH
